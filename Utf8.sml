@@ -64,6 +64,28 @@ structure Utf8 :> UTF8 = struct
 	    infix 6 orb andb xorb <<
 
             fun decode (byte, (n, i, cp, a)) =
+
+                (* 
+                   byte is the next byte in the encoding.
+
+                   n is the total number of bytes being decoded for
+                   the pending codepoint (if any, otherwise 0). It's
+                   used after the codepoint has been decoded, to
+                   confirm that it was a high enough codepoint for the
+                   byte count so as to reject overlong encodings.
+
+                   i is the number of bytes remaining to be decoded
+                   for the pending codepoint, counting down with each
+                   byte.
+
+                   cp is the pending codepoint in the process of being
+                   decoded.
+
+                   a is the accumulator value from the outer foldl, so
+                   the value that will be passed to a call to the fold
+                   function along with each new codepoint.
+                *)
+
                 let val w = Word.fromLargeWord (Word8.toLargeWord byte)
                 in
                     case i of
