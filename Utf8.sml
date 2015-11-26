@@ -90,7 +90,7 @@ structure Utf8 :> UTF8 = struct
                 in
                     case i of
                         0 => if w andb b1_mask = 0wx0 then
-                                 (0, 0, 0wx0, f(w, a))
+                                 (0, 0, 0wx0, f (w, a))
                              else if w andb b2_mask = b2_marker then
                                  (2, 1, w xorb b2_marker, a)
                              else if w andb b3_mask = b3_marker then
@@ -98,7 +98,7 @@ structure Utf8 :> UTF8 = struct
                              else if w andb b4_mask = b4_marker then
                                  (4, 3, w xorb b4_marker, a)
                              else
-                                 (0, 0, 0wx0, f(replacement, a))
+                                 (0, 0, 0wx0, f (replacement, a))
 
                       | 1 => if w andb bb_mask = bb_marker then
                                  let val cp = (cp << 0w6) orb (w xorb bb_marker)
@@ -109,19 +109,20 @@ structure Utf8 :> UTF8 = struct
                                          (0, 0, 0wx0, f(cp, a))
                                  end
                              else
-                                 decode (byte, (0, 0, 0wx0, f(replacement, a)))
+                                 decode (byte, (0, 0, 0wx0, f (replacement, a)))
 
                       | i => if w andb bb_mask = bb_marker then
                                  let val cp = (cp << 0w6) orb (w xorb bb_marker)
                                  in (n, Int.-(i, 1), cp, a)
                                  end
                              else
-                                 decode (byte, (0, 0, 0wx0, f(replacement, a)))
+                                 decode (byte, (0, 0, 0wx0, f (replacement, a)))
                 end
         in
-            case Word8Vector.foldl decode (0, 0, 0wx0, a) (Byte.stringToBytes s) of
+            case Word8Vector.foldl decode (0, 0, 0wx0, a)
+                                   (Byte.stringToBytes s) of
                 (n, 0, 0wx0, result) => result
-              | (n, i, cp, result) => f(replacement, result)
+              | (n, i, cp, result) => f (replacement, result)
         end
             
     val concat = String.concat
