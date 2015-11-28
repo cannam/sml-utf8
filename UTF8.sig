@@ -1,7 +1,7 @@
 
 signature UTF8 = sig
     type t
-             
+
     val foldl : (word * 'a -> 'a) -> 'a -> t -> 'a
     val concat : t list -> t
     val concatWith : t -> t list -> t
