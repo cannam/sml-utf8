@@ -130,7 +130,10 @@ structure Utf8 :> UTF8 = struct
                          
     fun explode s = rev (foldl (op ::) [] s)
     fun size s = foldl (fn (_, n) => n + 1) 0 s
-
+                       
     fun fromString s = s
     fun toString s = s
+
+    fun explodeString s = explode (fromString s)
+    fun implodeString s = toString (implode s)
 end
