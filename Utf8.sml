@@ -5,7 +5,7 @@ structure Utf8 :> UTF8 = struct
 
     val _ = if Word.wordSize < 22 then raise Fail "Inadequate word size" else ()
 
-    fun codepoints_to_string (cps : t) : string =
+    fun codepoints_to_string folder cps =
         let open Word
 	    infix 6 orb andb >>
 	    val char_of = Char.chr o toInt
@@ -14,7 +14,7 @@ structure Utf8 :> UTF8 = struct
                 (* foldr to ensure the string is built up in the right
                    order using only conses; this does mean the individual
                    codepoint series need to be pushed in reverse *)
-                (Vector.foldr (fn (cp, acc) => 
+                (folder (fn (cp, acc) => 
                            if cp < 0wx80 then
                                char_of cp :: acc
                            else if cp < 0wx800 then
@@ -137,12 +137,13 @@ structure Utf8 :> UTF8 = struct
 
     val size = Vector.length
 
-    fun fromString s = Vector.fromList (rev (foldl_string (op ::) [] s))
+    fun explodeString s = rev (foldl_string (op ::) [] s)
+                                  
+    fun fromString s = Vector.fromList (explodeString s)
                            
-    val toString = codepoints_to_string
+    val toString = codepoints_to_string Vector.foldr
 
-    fun explodeString s = explode (fromString s)
-    fun implodeString u = toString (implode u)
+    val implodeString = codepoints_to_string List.foldr
 
     val compare = Vector.collate Word.compare
 
