@@ -20,6 +20,6 @@ signature SIMPLE_WIDE_STRING = sig
     val toUtf8 : t -> string
 
     val explodeUtf8 : string -> word list
-    val implodeUtf8 : word list -> string
+    val implodeToUtf8 : word list -> string
                                        
 end

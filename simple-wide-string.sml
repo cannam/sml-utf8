@@ -147,7 +147,7 @@ structure SimpleWideString :> SIMPLE_WIDE_STRING = struct
     fun fromUtf8 s = Vector.fromList (explodeUtf8 s)
 
     val toUtf8 = codepoints_to_string Vector.foldr
-    val implodeUtf8 = codepoints_to_string List.foldr
+    val implodeToUtf8 = codepoints_to_string List.foldr
 
     val compare = Vector.collate Word.compare
 
