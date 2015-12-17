@@ -1,6 +1,6 @@
 
 signature UTF8 = sig
-    type t
+    eqtype t
 
     val foldl : (word * 'a -> 'a) -> 'a -> t -> 'a
     val foldr : (word * 'a -> 'a) -> 'a -> t -> 'a
@@ -14,5 +14,6 @@ signature UTF8 = sig
     val fromString : string -> t
     val toString : t -> string
     val compare : t * t -> order
-    val sub : t * int -> word                               
+    val sub : t * int -> word
+    val empty : t
 end

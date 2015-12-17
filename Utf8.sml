@@ -147,5 +147,7 @@ structure Utf8 :> UTF8 = struct
     val compare = Vector.collate Word.compare
 
     val sub = Vector.sub
-                                 
+
+    val empty = implode []
+                  
 end
