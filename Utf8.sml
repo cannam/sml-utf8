@@ -1,11 +1,11 @@
                      
 structure Utf8 :> UTF8 = struct
 
-    type t = string
+    type t = word vector
 
     val _ = if Word.wordSize < 22 then raise Fail "Inadequate word size" else ()
 
-    fun implode cps =
+    fun codepoints_to_string (cps : t) : string =
         let open Word
 	    infix 6 orb andb >>
 	    val char_of = Char.chr o toInt
@@ -14,7 +14,7 @@ structure Utf8 :> UTF8 = struct
                 (* foldr to ensure the string is built up in the right
                    order using only conses; this does mean the individual
                    codepoint series need to be pushed in reverse *)
-                (List.foldr (fn (cp, acc) => 
+                (Vector.foldr (fn (cp, acc) => 
                            if cp < 0wx80 then
                                char_of cp :: acc
                            else if cp < 0wx800 then
@@ -59,7 +59,7 @@ structure Utf8 :> UTF8 = struct
           | 4 => 0wx10000
           | _ => 0wx0
                      
-    fun foldl f a s =
+    fun foldl_string f a s =
         let open Word
 	    infix 6 orb andb xorb <<
 
@@ -125,15 +125,27 @@ structure Utf8 :> UTF8 = struct
               | (n, i, cp, result) => f (replacement, result)
         end
             
-    val concat = String.concat
-    val concatWith = String.concatWith
-                         
-    fun explode s = rev (foldl (op ::) [] s)
-    fun size s = foldl (fn (_, n) => n + 1) 0 s
-                       
-    fun fromString s = s
-    fun toString s = s
+    val concat = Vector.concat
+(*    val concatWith = Vector.concatWith *)
+
+    val foldl = Vector.foldl
+    val foldr = Vector.foldr
+                   
+    fun explode u = rev (foldl (op ::) [] u)
+
+    val implode = Vector.fromList
+
+    val size = Vector.length
+
+    fun fromString s = Vector.fromList (rev (foldl_string (op ::) [] s))
+                           
+    val toString = codepoints_to_string
 
     fun explodeString s = explode (fromString s)
-    fun implodeString s = toString (implode s)
+    fun implodeString u = toString (implode u)
+
+    val compare = Vector.collate Word.compare
+
+    val sub = Vector.sub
+                                 
 end
