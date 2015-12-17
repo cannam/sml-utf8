@@ -1,5 +1,5 @@
                      
-structure Utf8 :> UTF8 = struct
+structure SimpleWideString :> SIMPLE_WIDE_STRING = struct
 
     type t = word vector
 
@@ -124,30 +124,32 @@ structure Utf8 :> UTF8 = struct
                 (n, 0, 0wx0, result) => result
               | (n, i, cp, result) => f (replacement, result)
         end
+
+    val size = Vector.length
+    val sub = Vector.sub
             
     val concat = Vector.concat
-(*    val concatWith = Vector.concatWith *)
+
+    fun concatWith u uu =
+        Vector.concat
+            (List.foldr
+                 (fn (w, []) => [w]
+                   | (w, a) => w::u::a) [] uu)
 
     val foldl = Vector.foldl
     val foldr = Vector.foldr
+    val map = Vector.map
                    
     fun explode u = rev (foldl (op ::) [] u)
-
     val implode = Vector.fromList
 
-    val size = Vector.length
+    fun explodeUtf8 s = rev (foldl_string (op ::) [] s)
+    fun fromUtf8 s = Vector.fromList (explodeUtf8 s)
 
-    fun explodeString s = rev (foldl_string (op ::) [] s)
-                                  
-    fun fromString s = Vector.fromList (explodeString s)
-                           
-    val toString = codepoints_to_string Vector.foldr
-
-    val implodeString = codepoints_to_string List.foldr
+    val toUtf8 = codepoints_to_string Vector.foldr
+    val implodeUtf8 = codepoints_to_string List.foldr
 
     val compare = Vector.collate Word.compare
-
-    val sub = Vector.sub
 
     val empty = implode []
                   
