@@ -1,5 +1,5 @@
                      
-structure SimpleWideString :> SIMPLE_WIDE_STRING = struct
+structure WdString :> SIMPLE_WIDE_STRING = struct
 
     type t = word vector
 
