@@ -151,6 +151,6 @@ structure WdString :> SIMPLE_WIDE_STRING = struct
 
     val compare = Vector.collate Word.compare
 
-    val empty = implode []
+    val empty : word vector = implode []
                   
 end
