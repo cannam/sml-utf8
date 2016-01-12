@@ -143,6 +143,9 @@ structure WdString :> SIMPLE_WIDE_STRING = struct
     fun explode u = rev (foldl (op ::) [] u)
     val implode = Vector.fromList
 
+    fun fromVector u = u
+    fun toVector u = u
+
     fun explodeUtf8 s = rev (foldl_string (op ::) [] s)
     fun fromUtf8 s = Vector.fromList (explodeUtf8 s)
 
