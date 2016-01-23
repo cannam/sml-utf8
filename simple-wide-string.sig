@@ -10,6 +10,7 @@ signature SIMPLE_WIDE_STRING = sig
     val compare : t * t -> order
     val empty : t
 
+    val app : (word -> unit) -> t -> unit
     val map : (word -> word) -> t -> t
     val foldl : (word * 'a -> 'a) -> 'a -> t -> 'a
     val foldr : (word * 'a -> 'a) -> 'a -> t -> 'a

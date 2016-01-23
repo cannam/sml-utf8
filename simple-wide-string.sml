@@ -138,6 +138,7 @@ structure WdString :> SIMPLE_WIDE_STRING = struct
 
     val foldl = Vector.foldl
     val foldr = Vector.foldr
+    val app = Vector.app
     val map = Vector.map
                    
     fun explode u = rev (foldl (op ::) [] u)
