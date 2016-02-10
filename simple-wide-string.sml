@@ -11,9 +11,11 @@ structure WdString :> SIMPLE_WIDE_STRING = struct
 	    val char_of = Char.chr o toInt
         in
             String.implode
-                (* foldr to ensure the string is built up in the right
-                   order using only conses; this does mean the individual
-                   codepoint series need to be pushed in reverse *)
+                (* folder is the foldr function for whichever
+                   container cps is. We use foldr to ensure the string
+                   is built up in the right order using only conses;
+                   this does mean the individual codepoint series need
+                   to be pushed in reverse *)
                 (folder (fn (cp, acc) => 
                            if cp < 0wx80 then
                                char_of cp :: acc
