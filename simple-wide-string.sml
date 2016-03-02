@@ -5,6 +5,8 @@ structure WdString :> SIMPLE_WIDE_STRING = struct
 
     val _ = if Word.wordSize < 22 then raise Fail "Inadequate word size" else ()
 
+    val codepoint_limit = 0wx10ffff
+                                                                                  
     fun codepoints_to_string folder cps =
         let open Word
 	    infix 6 orb andb >>
@@ -28,23 +30,8 @@ structure WdString :> SIMPLE_WIDE_STRING = struct
 		               char_of (0wx80 orb ((cp >> 0w6) andb 0wx3f)) ::
 		               char_of (0wx80 orb (cp andb 0wx3f)) ::
                                acc
-                           else if cp < 0wx200000 then
+                           else if cp < codepoint_limit then
 		               char_of (0wxf0 orb (cp >> 0w18)) ::
-		               char_of (0wx80 orb ((cp >> 0w12) andb 0wx3f)) ::
-		               char_of (0wx80 orb ((cp >> 0w6) andb 0wx3f)) ::
-		               char_of (0wx80 orb (cp andb 0wx3f)) ::
-                               acc
-                           else if cp < 0wx4000000 then
-		               char_of (0wxf8 orb (cp >> 0w24)) ::
-		               char_of (0wx80 orb ((cp >> 0w18) andb 0wx3f)) ::
-		               char_of (0wx80 orb ((cp >> 0w12) andb 0wx3f)) ::
-		               char_of (0wx80 orb ((cp >> 0w6) andb 0wx3f)) ::
-		               char_of (0wx80 orb (cp andb 0wx3f)) ::
-                               acc
-                           else if cp < 0wx80000000 then
-		               char_of (0wxfc orb (cp >> 0w30)) ::
-		               char_of (0wx80 orb ((cp >> 0w24) andb 0wx3f)) ::
-		               char_of (0wx80 orb ((cp >> 0w18) andb 0wx3f)) ::
 		               char_of (0wx80 orb ((cp >> 0w12) andb 0wx3f)) ::
 		               char_of (0wx80 orb ((cp >> 0w6) andb 0wx3f)) ::
 		               char_of (0wx80 orb (cp andb 0wx3f)) ::
@@ -61,15 +48,11 @@ structure WdString :> SIMPLE_WIDE_STRING = struct
     val b2_mask = 0wxe0 (* 11100000 *)
     val b3_mask = 0wxf0 (* 11110000 *)
     val b4_mask = 0wxf8 (* 11111000 *)
-    val b5_mask = 0wxfc (* 11111100 *)
-    val b6_mask = 0wxfe (* 11111110 *)
     val bb_mask = 0wxc0 (* 11000000 *)
 
     val b2_marker = 0wxc0 (* 11000000 *)
     val b3_marker = 0wxe0 (* 11100000 *)
     val b4_marker = 0wxf0 (* 11110000 *)
-    val b5_marker = 0wxf8 (* 11111000 *)
-    val b6_marker = 0wxfc (* 11111100 *)
     val bb_marker = 0wx80 (* 10000000 *)
 
     fun overlong n =
@@ -79,8 +62,6 @@ structure WdString :> SIMPLE_WIDE_STRING = struct
             2 => 0wx0080
           | 3 => 0wx0800
           | 4 => 0wx10000
-          | 5 => 0wx200000
-          | 6 => 0wx4000000
           | _ => 0wx0
                      
     fun foldl_string f a s =
@@ -121,10 +102,6 @@ structure WdString :> SIMPLE_WIDE_STRING = struct
                                  (3, 2, w xorb b3_marker, a)
                              else if w andb b4_mask = b4_marker then
                                  (4, 3, w xorb b4_marker, a)
-                             else if w andb b5_mask = b5_marker then
-                                 (5, 4, w xorb b5_marker, a)
-                             else if w andb b6_mask = b6_marker then
-                                 (6, 5, w xorb b6_marker, a)
                              else
                                  (0, 0, 0wx0, f (replacement, a))
 
@@ -132,6 +109,8 @@ structure WdString :> SIMPLE_WIDE_STRING = struct
                                  let val cp = (cp << 0w6) orb (w xorb bb_marker)
                                  in
                                      if cp < overlong n then
+                                         (0, 0, 0wx0, f (replacement, a))
+                                     else if cp > codepoint_limit then
                                          (0, 0, 0wx0, f (replacement, a))
                                      else
                                          (0, 0, 0wx0, f (cp, a))
