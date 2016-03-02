@@ -1,5 +1,3 @@
-$(SML_LIB)/basis/basis.mlb
-UTF8.sig
-Utf8.sml
+simple-wide-string.mlb
 test.sml
 main.sml

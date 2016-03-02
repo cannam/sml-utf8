@@ -6,7 +6,7 @@ fun app_stream f stream =
 
 fun process_file f =
     let val stream = TextIO.openIn f
-        val process = Utf8.toString o Utf8.implode o Utf8.explode o Utf8.fromString
+        val process = WdString.toUtf8 o WdString.implode o WdString.explode o WdString.fromUtf8
     in
         app_stream (print o process) stream;
         TextIO.closeIn stream
