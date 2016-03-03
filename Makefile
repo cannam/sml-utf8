@@ -1,14 +1,16 @@
 
-TESTFILES	:= simple.txt sampler.txt emoji.txt
+TESTFILES	:= testfiles/simple.txt testfiles/sampler.txt testfiles/emoji.txt
 
-test:	test.mlb simple-wide-string.sml simple-wide-string.sig test.sml main.sml
-	mlton test.mlb
+test:	process
 	@for t in ${TESTFILES} ; do \
-		./test $$t > test-out.txt ; \
+		./process $$t > test-out.txt ; \
 		if diff $$t test-out.txt ; then echo Test $$t succeeded ; \
 		else echo Test $$t failed ; \
 		fi ; \
 	done
 
+process: process.mlb simple-wide-string.sml simple-wide-string.sig process.sml main.sml
+	mlton process.mlb
+
 clean:
-	rm -f test
+	rm -f process

@@ -1,4 +1,7 @@
 
+(* Take an input file and pass it through a utf8 decoder/encoder
+   chain, writing the result to stdout. Used for integrity checks. *)
+
 fun app_stream f stream =
     case TextIO.inputLine stream of
 	SOME line => (f line; app_stream f stream)
@@ -16,7 +19,7 @@ fun process_file f =
 fun main () =
     case CommandLine.arguments () of
         [infile] => process_file infile
-      | _ => (TextIO.output (TextIO.stdErr, "Usage: test file.txt\n");
+      | _ => (TextIO.output (TextIO.stdErr, "Usage: process file.txt\n");
               raise Fail "Incorrect arguments specified")
 
                  
