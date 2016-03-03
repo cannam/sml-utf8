@@ -1,4 +1,7 @@
 
+(* Copyright 2015-2016 Chris Cannam.
+   MIT/X11 licence. See the file COPYING for details. *)
+
 signature ENCODER = sig
 
     val codepoints_to_utf8 :
