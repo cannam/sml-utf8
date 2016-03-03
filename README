@@ -8,11 +8,14 @@ decoder are provided as separate structures, they are given only
 minimal signatures. The general-purpose interface is through the
 string structure and its signature.
 
-The decoder is designed to meet "modern" standards, meaning that it
-identifies invalid and overlong encodings and substitutes the Unicode
+The decoder is designed for easy and safe interoperability: it
+identifies invalid and overlong encodings, and substitutes the Unicode
 replacement character for each such sequence as soon as it is
-recognised. It also rejects codepoints above the 17-plane Unicode
-limit.
+recognised. It does the same thing with codepoints above the 17-plane
+Unicode limit.
 
 Copyright 2015-2016 Chris Cannam.
+Decoder inspired by Utf8.sml by Martin Elsman.
+Encoder influenced by utf8.sml by John Reppy.
+
 MIT/X11 licence. See the file COPYING for details.
