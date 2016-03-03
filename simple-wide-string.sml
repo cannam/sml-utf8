@@ -30,11 +30,11 @@ structure WdString :> SIMPLE_WIDE_STRING = struct
     fun fromVector u = u
     fun toVector u = u
 
-    fun explodeUtf8 s = rev (Decoder.foldl_string (op ::) [] s)
+    fun explodeUtf8 s = rev (Utf8Decoder.foldl_string (op ::) [] s)
     fun fromUtf8 s = Vector.fromList (explodeUtf8 s)
 
-    val toUtf8 = Encoder.codepoints_to_utf8 Vector.foldr
-    val implodeToUtf8 = Encoder.codepoints_to_utf8 List.foldr
+    val toUtf8 = Utf8Encoder.codepoints_to_utf8 Vector.foldr
+    val implodeToUtf8 = Utf8Encoder.codepoints_to_utf8 List.foldr
 
     val compare = Vector.collate Word.compare
 

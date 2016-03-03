@@ -2,7 +2,7 @@
 (* Copyright 2015-2016 Chris Cannam.
    MIT/X11 licence. See the file COPYING for details. *)
 
-signature DECODER = sig
+signature UTF8_DECODER = sig
 
     val foldl_string :
         (word * word list -> word list) -> word list -> string
@@ -10,7 +10,7 @@ signature DECODER = sig
         
 end
 
-structure Decoder :> DECODER = struct
+structure Utf8Decoder :> UTF8_DECODER = struct
 
     val codepoint_limit = 0wx10ffff
 

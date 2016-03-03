@@ -2,7 +2,7 @@
 (* Copyright 2015-2016 Chris Cannam.
    MIT/X11 licence. See the file COPYING for details. *)
 
-signature ENCODER = sig
+signature UTF8_ENCODER = sig
 
     val codepoints_to_utf8 :
         ((word * char list -> char list) -> char list -> 'a -> char list)
@@ -11,7 +11,7 @@ signature ENCODER = sig
 
 end
 
-structure Encoder : ENCODER = struct
+structure Utf8Encoder : UTF8_ENCODER = struct
 
     val codepoint_limit = 0wx10ffff
                                                                                   
