@@ -14,8 +14,8 @@ replacement character for each such sequence as soon as it is
 recognised. It does the same thing with codepoints above the 17-plane
 Unicode limit.
 
-Copyright 2015-2016 Chris Cannam.
-Decoder inspired by Utf8.sml by Martin Elsman.
-Encoder influenced by utf8.sml by John Reppy.
+Copyright 2015-2016 Chris Cannam. Decoder inspired by Utf8.sml by
+Martin Elsman (https://github.com/melsman/unicode). Encoder influenced
+by utf8.sml by John Reppy.
 
 MIT/X11 licence. See the file COPYING for details.
