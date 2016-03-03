@@ -9,7 +9,7 @@ test:	process
 		fi ; \
 	done
 
-process: process.mlb simple-wide-string.sml simple-wide-string.sig process.sml main.sml
+process: process.mlb encoder.sml decoder.sml simple-wide-string.sml simple-wide-string.sig process.sml main.sml
 	mlton process.mlb
 
 clean:

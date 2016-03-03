@@ -1,3 +1,5 @@
 $(SML_LIB)/basis/basis.mlb
+encoder.sml
+decoder.sml
 simple-wide-string.sig
 simple-wide-string.sml
