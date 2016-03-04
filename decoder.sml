@@ -2,15 +2,15 @@
 (* Copyright 2015-2016 Chris Cannam.
    MIT/X11 licence. See the file COPYING for details. *)
 
-signature UTF8_DECODER = sig
+structure Utf8Decoder :> sig
 
+    (* Left fold over a UTF-8 string, yielding a series of ISO-10646
+       codepoint values. *)
     val foldl_string :
         (word * word list -> word list) -> word list -> string
         -> word list
         
-end
-
-structure Utf8Decoder :> UTF8_DECODER = struct
+end = struct
 
     val codepoint_limit = 0wx10ffff
 

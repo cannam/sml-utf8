@@ -2,19 +2,20 @@
 (* Copyright 2015-2016 Chris Cannam.
    MIT/X11 licence. See the file COPYING for details. *)
 
-signature UTF8_ENCODER = sig
+structure Utf8Encoder :> sig
 
+    (* Given a container (e.g. a list) of ISO-10646 codepoint values and
+       a matching right-fold function (e.g. List.foldr), produce a UTF-8
+       encoding as a string. *)
     val codepoints_to_utf8 :
         ((word * char list -> char list) -> char list -> 'a -> char list)
         -> 'a
         -> string
-
-end
-
-structure Utf8Encoder : UTF8_ENCODER = struct
+               
+end = struct
 
     val codepoint_limit = 0wx10ffff
-                                                                                  
+
     fun codepoints_to_utf8 folder cps =
         let open Word
 	    infix 6 orb andb >>
