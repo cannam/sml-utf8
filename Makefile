@@ -1,4 +1,6 @@
 
+SCRIPTS	:= ../sml-buildscripts
+
 TESTFILES	:= testfiles/simple.txt testfiles/sampler.txt testfiles/emoji.txt
 
 test:	process
@@ -9,8 +11,16 @@ test:	process
 		fi ; \
 	done
 
-process: process.mlb encoder.sml decoder.sml simple-wide-string.sml simple-wide-string.sig process.sml main.sml
+process: process.mlb d/process.deps
 	mlton process.mlb
 
+d/process.deps:	process.mlb
+	${SCRIPTS}/mlb-dependencies $< > $@
+
+coverage:
+	${SCRIPTS}/mlb-coverage process.mlb testfiles/emoji.txt
+
 clean:
-	rm -f process
+	rm -f process d/*
+
+-include d/*.deps
