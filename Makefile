@@ -11,8 +11,19 @@ test:	process
 		fi ; \
 	done
 
+timing:	process testfiles/long.txt
+	time ./process testfiles/long.txt > test-out.txt
+
 process: process.mlb d/process.deps
 	mlton process.mlb
+
+testfiles/long.txt:	testfiles/sampler.txt
+	@cp $< tmp.txt; \
+	for n in 2 4 8 16 32 64 128 256 512 1024 ; do \
+		cat tmp.txt tmp.txt > tmp-out.txt ; \
+		mv tmp-out.txt tmp.txt ; \
+	done ; \
+	mv tmp.txt $@ 
 
 d/process.deps:	process.mlb
 	${SCRIPTS}/mlb-dependencies $< > $@
