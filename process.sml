@@ -1,6 +1,7 @@
 
 (* Take an input file and pass it through a utf8 decoder/encoder
-   chain, writing the result to stdout. Used for integrity checks. *)
+   chain, writing the result to stdout. Used for testing the decoder
+   and encoder. *)
 
 fun app_stream f stream =
     case TextIO.inputLine stream of

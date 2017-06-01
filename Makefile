@@ -2,14 +2,19 @@
 SCRIPTS	:= ../sml-buildscripts
 
 TESTFILES	:= testfiles/simple.txt testfiles/sampler.txt testfiles/emoji.txt
+BROKEN		:= testfiles/broken-input.html
 
 test:	process
 	@for t in ${TESTFILES} ; do \
 		./process $$t > test-out.txt ; \
-		if diff $$t test-out.txt ; then echo Test $$t succeeded ; \
+		if diff -u $$t test-out.txt ; then echo Test $$t succeeded ; \
 		else echo Test $$t failed ; \
 		fi ; \
 	done
+	@./process ${BROKEN} > test-out.txt
+	@if diff -u testfiles/broken-expected.html test-out.txt ; then echo Test ${BROKEN} succeeded ; \
+	else echo Test ${BROKEN} failed ; \
+	fi
 
 timing:	process testfiles/long.txt
 	time ./process testfiles/long.txt > test-out.txt

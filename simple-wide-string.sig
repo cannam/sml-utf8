@@ -1,5 +1,5 @@
 
-(* Copyright 2015-2016 Chris Cannam.
+(* Copyright 2015-2017 Chris Cannam.
    MIT/X11 licence. See the file COPYING for details. *)
 
 signature SIMPLE_WIDE_STRING = sig
