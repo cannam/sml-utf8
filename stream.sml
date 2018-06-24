@@ -108,7 +108,7 @@ should pass with any values *)
             main_buffer ^ sync_stub
         end
 
-    fun readAndConvert (instream, n) : WdString.t =
+    fun readAndConvert (instream : instream, n) : WdString.t =
         WdString.fromUtf8
             (case (#stream instream) of
                  BIN_STREAM s => readBin (s, n)
@@ -117,7 +117,7 @@ should pass with any values *)
     datatype load_result = EOF
                          | HAVE of int
 
-    fun available instream =
+    fun available (instream : instream) =
         WdString.size (!(#buffer instream)) - !(#index instream)
 
     fun shorten (instream as { buffer, index, ... } : instream) =
@@ -162,19 +162,19 @@ should pass with any values *)
     fun inRange ({ buffer, index, ... } : instream) =
         !index < WdString.size (!buffer)
 
-    fun endOfStream instr =
-        (not (inRange instr)) andalso
-        case (#stream instr) of
+    fun endOfStream (instream : instream) =
+        (not (inRange instream)) andalso
+        case (#stream instream) of
             BIN_STREAM s => BinIO.endOfStream s
           | TEXT_STREAM s => TextIO.endOfStream s
 
-    fun peek1 instream =
+    fun peek1 (instream : instream) =
         case loadFor (instream, 1) of
             EOF => NONE
           | HAVE _ => SOME (WdString.sub (!(#buffer instream),
                                           !(#index instream)))
         
-    fun peekN (instream, n) =
+    fun peekN (instream : instream, n) =
         case loadFor (instream, n) of
             EOF => WdString.empty
           | HAVE m => WdString.tabulate
@@ -183,20 +183,20 @@ should pass with any values *)
                                        (!(#buffer instream),
                                         i + !(#index instream)))
 
-    fun input1 instream =
+    fun input1 (instream : instream) =
         case peek1 instream of
             NONE => NONE
           | rv => 
             ((#index instream) := !(#index instream) + 1;
              rv)
 
-    fun inputN (instream, n) =
+    fun inputN (instream : instream, n) =
         case peekN (instream, n) of
             rv =>
             ((#index instream) := !(#index instream) + WdString.size rv;
              rv)
         
-    fun inputAll instream =
+    fun inputAll (instream : instream) =
         let val bs = misc_block_size
             fun inputAll' acc =
                 let val v = inputN (instream, bs)
@@ -209,7 +209,7 @@ should pass with any values *)
             inputAll' []
         end
                              
-    fun inputLine instream =
+    fun inputLine (instream : instream) =
         let val nl = Word.fromInt (Char.ord #"\n")
             fun inputLine' acc =
                 case input1 instream of
