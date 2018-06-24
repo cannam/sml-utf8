@@ -5,6 +5,9 @@ signature IN_STREAM = sig
     val openIn : string -> instream
     val openString : string -> instream
 
+    val fromTextStream : TextIO.instream -> instream
+    val fromBinStream : BinIO.instream -> instream
+
     val closeIn : instream -> unit
     val endOfStream : instream -> bool
 
@@ -18,14 +21,20 @@ signature IN_STREAM = sig
     val inputLine : instream -> WdString.t option
 
 end
-                          
+
+(*!!! better name please *)
 structure CodepointInStream :> IN_STREAM = struct
 
     datatype stream = BIN_STREAM of BinIO.instream
                     | TEXT_STREAM of TextIO.instream
 
-(*!!!    val read_buffer_size = 8192 -- to be restored *)
+    (*!!!    val read_buffer_size = 8192 -- to be restored *)
+
+(*!!! Turtle tests pass with 50 & 1000 but fail with 1 & 2 -- they
+should pass with any values *)
+                                         
     val read_buffer_size = 50
+    val misc_block_size = 1000
 
     (* A byte masked with bb_mask yields bb_marker if and only if it
        is a continuation byte *)
@@ -50,6 +59,18 @@ structure CodepointInStream :> IN_STREAM = struct
         index = ref 0
     }
 
+    fun fromTextStream str = {
+        stream = TEXT_STREAM str,
+        buffer = ref WdString.empty,
+        index = ref 0
+    }
+
+    fun fromBinStream str = {
+        stream = BIN_STREAM str,
+        buffer = ref WdString.empty,
+        index = ref 0
+    }
+                                
     fun closeIn ({ stream, ... } : instream) =
         case stream of
             BIN_STREAM s => BinIO.closeIn s
@@ -176,7 +197,7 @@ structure CodepointInStream :> IN_STREAM = struct
              rv)
         
     fun inputAll instream =
-        let val bs = 1000
+        let val bs = misc_block_size
             fun inputAll' acc =
                 let val v = inputN (instream, bs)
                 in
