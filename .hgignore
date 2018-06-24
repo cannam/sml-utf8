@@ -1,3 +1,4 @@
 syntax: glob
 process
 test-out.txt
+*~

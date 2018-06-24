@@ -13,7 +13,7 @@ signature SIMPLE_WIDE_STRING = sig
        string. This may not correspond to a printable character, as we
        have simple codepoints, not Unicode grapheme clusters. *)
     val sub : t * int -> word
-
+                             
     (* Concatenate a list of strings. *)
     val concat : t list -> t
 
@@ -25,7 +25,7 @@ signature SIMPLE_WIDE_STRING = sig
        meaningful collation order. *)
     val compare : t * t -> order
 
-    (* Test for the empty string. *)
+    (* The empty string. *)
     val empty : t
 
     (* Apply the given function returning unit to each codepoint in
@@ -45,6 +45,10 @@ signature SIMPLE_WIDE_STRING = sig
        the right. *)
     val foldr : (word * 'a -> 'a) -> 'a -> t -> 'a
 
+    (* Generate a new string by supplying successive indices to a
+       function that returns a codepoint based on index *)
+    val tabulate : int * (int -> word) -> t
+                                                    
     (* Convert a list of codepoints to a simple wide string. *)
     val implode : word list -> t
 

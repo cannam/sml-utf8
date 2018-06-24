@@ -23,18 +23,19 @@ structure WdString :> SIMPLE_WIDE_STRING = struct
     val foldr = Vector.foldr
     val app = Vector.app
     val map = Vector.map
-                   
+    val tabulate = Vector.tabulate
+                       
     fun explode u = rev (foldl (op ::) [] u)
     val implode = Vector.fromList
 
     fun fromVector u = u
     fun toVector u = u
 
-    fun explodeUtf8 s = rev (Utf8Decoder.foldl_string (op ::) [] s)
+    fun explodeUtf8 s = rev (Utf8Decoder.foldlString (op ::) [] s)
     fun fromUtf8 s = Vector.fromList (explodeUtf8 s)
 
-    val toUtf8 = Utf8Encoder.codepoints_to_utf8 Vector.foldr
-    val implodeToUtf8 = Utf8Encoder.codepoints_to_utf8 List.foldr
+    val toUtf8 = Utf8Encoder.codepointsToUtf8 Vector.foldr
+    val implodeToUtf8 = Utf8Encoder.codepointsToUtf8 List.foldr
 
     val compare = Vector.collate Word.compare
 
