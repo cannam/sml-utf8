@@ -28,13 +28,8 @@ structure CodepointInStream :> IN_STREAM = struct
     datatype stream = BIN_STREAM of BinIO.instream
                     | TEXT_STREAM of TextIO.instream
 
-    (*!!!    val read_buffer_size = 8192 -- to be restored *)
-
-(*!!! Turtle tests pass with 50 & 1000 but fail with 1 & 2 -- they
-should pass with any values *)
-                                         
-    val read_buffer_size = 50
-    val misc_block_size = 1000
+    val read_buffer_size = 8192
+    val misc_block_size = 1024
 
     (* A byte masked with bb_mask yields bb_marker if and only if it
        is a continuation byte *)
@@ -121,16 +116,16 @@ should pass with any values *)
         WdString.size (!(#buffer instream)) - !(#index instream)
 
     fun shorten (instream as { buffer, index, ... } : instream) =
-        let val len = available instream
-            val new_buffer =
-                WdString.implode
-                    (List.tabulate
-                         (len,
-                          fn i => WdString.sub (!buffer, i + !index)))
-        in
-            buffer := new_buffer;
-            index := 0
-        end
+        if !index > 0
+        then let val len = available instream
+                 val new_buffer =
+                     WdString.tabulate
+                         (len, fn i => WdString.sub (!buffer, i + !index))
+             in
+                 buffer := new_buffer;
+                 index := 0
+             end
+        else ()
 
     (* Attempt to load enough into the buffer to have n codepoints to
        read. Return EOF if the buffer is empty and nothing is
@@ -155,7 +150,7 @@ should pass with any values *)
                        | (_, have) => 
                          if have >= n
                          then HAVE have
-                         else loadFor (instream, n - have)
+                         else loadFor (instream, n)
                  end
         end
 
