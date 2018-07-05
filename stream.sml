@@ -1,15 +1,12 @@
-signature IN_STREAM = sig
+signature CODEPOINT_IO = sig
 
     type instream
+    type outstream
                        
     val openIn : string -> instream
     val openString : string -> instream
-
-    val fromTextStream : TextIO.instream -> instream
-    val fromBinStream : BinIO.instream -> instream
-
-    val closeIn : instream -> unit
-    val endOfStream : instream -> bool
+    val fromTextInStream : TextIO.instream -> instream
+    val fromBinInStream : BinIO.instream -> instream
 
     val peek1 : instream -> word option
     val peekN : instream * int -> WdString.t
@@ -20,13 +17,28 @@ signature IN_STREAM = sig
     val inputAll : instream -> WdString.t
     val inputLine : instream -> WdString.t option
 
+    val closeIn : instream -> unit
+    val endOfStream : instream -> bool
+
+    val openOut : string -> outstream
+    val fromTextOutStream : TextIO.outstream -> outstream
+    val fromBinOutStream : BinIO.outstream -> outstream
+
+    val output : outstream * WdString.t -> unit
+    val output1 : outstream * word -> unit
+
+    val flushOut : outstream -> unit
+    val closeOut : outstream -> unit
+                                    
 end
 
-(*!!! better name please *)
-structure CodepointInStream :> IN_STREAM = struct
+structure CodepointIO :> CODEPOINT_IO = struct
 
-    datatype stream = BIN_STREAM of BinIO.instream
-                    | TEXT_STREAM of TextIO.instream
+    datatype istr = BIN_ISTREAM of BinIO.instream
+                  | TEXT_ISTREAM of TextIO.instream
+
+    datatype ostr = BIN_OSTREAM of BinIO.outstream
+                  | TEXT_OSTREAM of TextIO.outstream
 
     val read_buffer_size = 8192
     val misc_block_size = 1024
@@ -37,39 +49,50 @@ structure CodepointInStream :> IN_STREAM = struct
     val bb_marker = Word8.fromLargeWord 0wx80 (* 10000000 *)
                                          
     type instream = {
-        stream : stream,
+        stream : istr,
         buffer : WdString.t ref,
         index : int ref
     }
+                                         
+    type outstream = ostr
 
     fun openIn filename = {
-        stream = BIN_STREAM (BinIO.openIn filename),
+        stream = BIN_ISTREAM (BinIO.openIn filename),
         buffer = ref WdString.empty,
         index = ref 0
     }
             
     fun openString string = {
-        stream = TEXT_STREAM (TextIO.openString string),
+        stream = TEXT_ISTREAM (TextIO.openString string),
         buffer = ref WdString.empty,
         index = ref 0
     }
 
-    fun fromTextStream str = {
-        stream = TEXT_STREAM str,
+    fun fromTextInStream str = {
+        stream = TEXT_ISTREAM str,
         buffer = ref WdString.empty,
         index = ref 0
     }
 
-    fun fromBinStream str = {
-        stream = BIN_STREAM str,
+    fun fromBinInStream str = {
+        stream = BIN_ISTREAM str,
         buffer = ref WdString.empty,
         index = ref 0
     }
-                                
+
+    fun openOut filename =
+        BIN_OSTREAM (BinIO.openOut filename)
+
+    fun fromTextOutStream str =
+        TEXT_OSTREAM str
+
+    fun fromBinOutStream str =
+        BIN_OSTREAM str
+                                  
     fun closeIn ({ stream, ... } : instream) =
         case stream of
-            BIN_STREAM s => BinIO.closeIn s
-          | TEXT_STREAM s => TextIO.closeIn s
+            BIN_ISTREAM s => BinIO.closeIn s
+          | TEXT_ISTREAM s => TextIO.closeIn s
 
     (*!!! to do: functorise or factorise *)
                                             
@@ -106,8 +129,8 @@ structure CodepointInStream :> IN_STREAM = struct
     fun readAndConvert (instream : instream, n) : WdString.t =
         WdString.fromUtf8
             (case (#stream instream) of
-                 BIN_STREAM s => readBin (s, n)
-               | TEXT_STREAM s => readText (s, n))
+                 BIN_ISTREAM s => readBin (s, n)
+               | TEXT_ISTREAM s => readText (s, n))
             
     datatype load_result = EOF
                          | HAVE of int
@@ -160,8 +183,8 @@ structure CodepointInStream :> IN_STREAM = struct
     fun endOfStream (instream : instream) =
         (not (inRange instream)) andalso
         case (#stream instream) of
-            BIN_STREAM s => BinIO.endOfStream s
-          | TEXT_STREAM s => TextIO.endOfStream s
+            BIN_ISTREAM s => BinIO.endOfStream s
+          | TEXT_ISTREAM s => TextIO.endOfStream s
 
     fun peek1 (instream : instream) =
         case loadFor (instream, 1) of
@@ -218,6 +241,32 @@ structure CodepointInStream :> IN_STREAM = struct
             then NONE
             else SOME (WdString.implode (rev (inputLine' [])))
         end
-                                          
+
+    fun output (outstream : outstream, ws : WdString.t) =
+        case outstream of
+            TEXT_OSTREAM s =>
+            TextIO.output (s, WdString.toUtf8 ws)
+          | BIN_OSTREAM s =>
+            BinIO.output (s, Byte.stringToBytes (WdString.toUtf8 ws))
+
+    fun output1 (outstream : outstream, w : word) =
+        case outstream of
+            TEXT_OSTREAM s =>
+            TextIO.output (s, String.implode (Utf8Encoder.codepointToUtf8 w))
+          | BIN_OSTREAM s =>
+            BinIO.output (s, Byte.stringToBytes
+                                 (String.implode
+                                      (Utf8Encoder.codepointToUtf8 w)))
+        
+    fun flushOut (outstream : outstream) =
+        case outstream of
+            TEXT_OSTREAM s => TextIO.flushOut s
+          | BIN_OSTREAM s => BinIO.flushOut s
+        
+    fun closeOut (outstream : outstream) =
+        case outstream of
+            TEXT_OSTREAM s => TextIO.closeOut s
+          | BIN_OSTREAM s => BinIO.closeOut s
+                         
 end
           
