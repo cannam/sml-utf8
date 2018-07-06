@@ -7,12 +7,12 @@ structure Utf8Encoder :> sig
     (* Given a container (e.g. a list) of ISO-10646 codepoint values and
        a matching right-fold function (e.g. List.foldr), produce a UTF-8
        encoding as a string. *)
-    val codepoints_to_utf8 :
+    val codepointsToUtf8 :
         ((word * char list -> char list) -> char list -> 'a -> char list)
         -> 'a
         -> string
 
-    val codepoint_to_utf8 :
+    val codepointToUtf8 :
         word -> char list
                
 end = struct
@@ -42,10 +42,10 @@ end = struct
             acc
         else acc
                               
-    fun codepoint_to_utf8 cp =
+    fun codepointToUtf8 cp =
         prepend_utf8 (cp, [])
                               
-    fun codepoints_to_utf8 folder cps =
+    fun codepointsToUtf8 folder cps =
         String.implode
             (* folder is the foldr function for whichever
                container cps is. We use foldr to ensure the string

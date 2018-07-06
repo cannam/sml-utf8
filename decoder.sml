@@ -6,7 +6,7 @@ structure Utf8Decoder :> sig
 
     (* Left fold over a UTF-8 string, yielding a series of ISO-10646
        codepoint values. *)
-    val foldl_string :
+    val foldlString :
         (word * word list -> word list) -> word list -> string
         -> word list
         
@@ -38,7 +38,7 @@ end = struct
           | 4 => 0wx10000
           | _ => 0wx0
                      
-    fun foldl_string f a s =
+    fun foldlString f a s =
         let open Word
 	    infix 6 orb andb xorb <<
 
