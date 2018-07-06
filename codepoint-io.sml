@@ -26,6 +26,7 @@ signature CODEPOINT_IO = sig
 
     val output : outstream * WdString.t -> unit
     val output1 : outstream * word -> unit
+    val outputUtf8 : outstream * string -> unit
 
     val flushOut : outstream -> unit
     val closeOut : outstream -> unit
@@ -257,6 +258,13 @@ structure CodepointIO :> CODEPOINT_IO = struct
             BinIO.output (s, Byte.stringToBytes
                                  (String.implode
                                       (Utf8Encoder.codepointToUtf8 w)))
+
+    fun outputUtf8 (outstream : outstream, us : string) =
+        case outstream of
+            TEXT_OSTREAM s =>
+            TextIO.output (s, us)
+          | BIN_OSTREAM s =>
+            BinIO.output (s, Byte.stringToBytes us)
         
     fun flushOut (outstream : outstream) =
         case outstream of
