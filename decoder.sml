@@ -9,6 +9,9 @@ structure Utf8Decoder :> sig
     val foldlString :
         (word * word list -> word list) -> word list -> string
         -> word list
+
+    val isValidUtf8 :
+        string -> bool
         
 end = struct
 
@@ -37,6 +40,9 @@ end = struct
           | 3 => 0wx0800
           | 4 => 0wx10000
           | _ => 0wx0
+
+    val surrogate_start = 0wxd800
+    val surrogate_end   = 0wxdfff
                      
     fun foldlString f a s =
         let open Word
@@ -86,6 +92,9 @@ end = struct
                                          (0, 0, 0wx0, f (replacement, a))
                                      else if cp > codepoint_limit then
                                          (0, 0, 0wx0, f (replacement, a))
+                                     else if cp >= surrogate_start andalso
+                                             cp <= surrogate_end then
+                                         (0, 0, 0wx0, f (replacement, a))
                                      else
                                          (0, 0, 0wx0, f (cp, a))
                                  end
@@ -104,6 +113,60 @@ end = struct
                                    (Byte.stringToBytes s) of
                 (n, 0, 0wx0, result) => result
               | (n, i, cp, result) => f (replacement, result)
+        end
+                     
+    fun isValidUtf8 s =
+        let open Word
+	    infix 6 orb andb xorb <<
+
+            (* Similar naming to "decode" within foldlString above.
+               See introductory comment there. This is directly tail-
+               recursive rather than a fold function *)
+                    
+            fun check [] (_, _, 0wx0) = true
+              | check [] (_, _, cp)   = false
+              | check (char :: chars) (n, i, cp) =
+                let val w = Word.fromLargeWord
+                                (Word8.toLargeWord(Byte.charToByte char))
+                    val check' = check chars
+                in
+                    case i of
+                        0 => if w andb b1_mask = 0wx0 then
+                                 check' (0, 0, 0wx0)
+                             else if w andb b2_mask = b2_marker then
+                                 check' (2, 1, w xorb b2_marker)
+                             else if w andb b3_mask = b3_marker then
+                                 check' (3, 2, w xorb b3_marker)
+                             else if w andb b4_mask = b4_marker then
+                                 check' (4, 3, w xorb b4_marker)
+                             else
+                                 false
+
+                      | 1 => if w andb bb_mask = bb_marker then
+                                 let val cp = (cp << 0w6) orb (w xorb bb_marker)
+                                 in
+                                     if cp < overlong n then
+                                         false
+                                     else if cp > codepoint_limit then
+                                         false
+                                     else if cp >= surrogate_start andalso
+                                             cp <= surrogate_end then
+                                         false
+                                     else
+                                         check' (0, 0, 0wx0)
+                                 end
+                             else
+                                 false
+
+                      | i => if w andb bb_mask = bb_marker then
+                                 let val cp = (cp << 0w6) orb (w xorb bb_marker)
+                                 in check' (n, Int.-(i, 1), cp)
+                                 end
+                             else
+                                 false
+                end
+        in
+            check (explode s) (0, 0, 0wx0)
         end
             
 end

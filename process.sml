@@ -16,11 +16,22 @@ fun process_file f =
         app_stream (print o process) stream;
         TextIO.closeIn stream
     end
+
+fun check_file f =
+    let val stream = TextIO.openIn f
+        fun check line = if Utf8Decoder.isValidUtf8 line
+                         then print ("    " ^ line)
+                         else print ("!!! " ^ line)
+    in
+        app_stream check stream;
+        TextIO.closeIn stream
+    end
         
 fun main () =
     case CommandLine.arguments () of
         [infile] => process_file infile
-      | _ => (TextIO.output (TextIO.stdErr, "Usage: process file.txt\n");
+      | ["-c", infile] => check_file infile
+      | _ => (TextIO.output (TextIO.stdErr, "Usage: process [-c] file.txt\n");
               raise Fail "Incorrect arguments specified")
 
                  

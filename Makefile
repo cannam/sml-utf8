@@ -7,13 +7,17 @@ BROKEN		:= testfiles/broken-input.html
 test:	process
 	@for t in ${TESTFILES} ; do \
 		./process $$t > test-out.txt ; \
-		if diff -u $$t test-out.txt ; then echo Test $$t succeeded ; \
-		else echo Test $$t failed ; \
+		if diff -u $$t test-out.txt ; then echo "Test $$t succeeded" ; \
+		else echo "Test $$t failed" ; \
 		fi ; \
 	done
+	@./process -c ${BROKEN} > test-out.txt
+	@if diff -u testfiles/broken-check-expected.html test-out.txt ; then echo "Test ${BROKEN} (check only) succeeded" ; \
+	else echo "Test ${BROKEN} (check only) failed" ; \
+	fi
 	@./process ${BROKEN} > test-out.txt
-	@if diff -u testfiles/broken-expected.html test-out.txt ; then echo Test ${BROKEN} succeeded ; \
-	else echo Test ${BROKEN} failed ; \
+	@if diff -u testfiles/broken-expected.html test-out.txt ; then echo "Test ${BROKEN} succeeded" ; \
+	else echo "Test ${BROKEN} failed" ; \
 	fi
 
 timing:	process testfiles/long.txt
