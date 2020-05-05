@@ -10,7 +10,15 @@ structure Utf8Decoder :> sig
         (word * word list -> word list) -> word list -> string
         -> word list
 
+    (* Return true if the given string is valid UTF-8, false
+       otherwise. *)
     val isValidUtf8 :
+        string -> bool
+        
+    (* Return true if the given string can be the start of a valid
+       UTF-8 string, i.e. if it is valid UTF-8 with the possible
+       exception that it may end in the middle of a codepoint. *)
+    val isValidUtf8Prefix :
         string -> bool
         
 end = struct
@@ -115,7 +123,7 @@ end = struct
               | (n, i, cp, result) => f (replacement, result)
         end
                      
-    fun isValidUtf8 s =
+    fun isValidUtf8' mayBePrefix s =
         let open Word
 	    infix 6 orb andb xorb <<
 
@@ -124,7 +132,7 @@ end = struct
                recursive rather than a fold function *)
                     
             fun check [] (_, _, 0wx0) = true
-              | check [] (_, _, cp)   = false
+              | check [] (_, _, cp)   = mayBePrefix
               | check (char :: chars) (n, i, cp) =
                 let val w = Word.fromLargeWord
                                 (Word8.toLargeWord(Byte.charToByte char))
@@ -168,6 +176,9 @@ end = struct
         in
             check (explode s) (0, 0, 0wx0)
         end
-            
+                           
+    val isValidUtf8 = isValidUtf8' false
+    val isValidUtf8Prefix = isValidUtf8' true
+      
 end
                         
