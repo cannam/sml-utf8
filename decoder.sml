@@ -4,20 +4,20 @@
 
 structure Utf8Decoder :> sig
 
-    (* Left fold over a UTF-8 string, yielding a series of ISO-10646
-       codepoint values. *)
+    (** Left fold over a UTF-8 string, yielding a series of ISO-10646
+        codepoint values. *)
     val foldlString :
         (word * word list -> word list) -> word list -> string
         -> word list
 
-    (* Return true if the given string is valid UTF-8, false
-       otherwise. *)
+    (** Return true if the given string is valid UTF-8, false
+        otherwise. *)
     val isValidUtf8 :
         string -> bool
         
-    (* Return true if the given string can be the start of a valid
-       UTF-8 string, i.e. if it is valid UTF-8 with the possible
-       exception that it may end in the middle of a codepoint. *)
+    (** Return true if the given string can be the start of a valid
+        UTF-8 string, i.e. if it is valid UTF-8 with the possible
+        exception that it may end in the middle of a codepoint. *)
     val isValidUtf8Prefix :
         string -> bool
         

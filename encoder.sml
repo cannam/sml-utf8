@@ -4,9 +4,9 @@
 
 structure Utf8Encoder :> sig
 
-    (* Given a container (e.g. a list) of ISO-10646 codepoint values and
-       a matching right-fold function (e.g. List.foldr), produce a UTF-8
-       encoding as a string. *)
+    (** Given a container (e.g. a list) of ISO-10646 codepoint values and
+        a matching right-fold function (e.g. List.foldr), produce a UTF-8
+        encoding as a string. *)
     val codepointsToUtf8 :
         ((word * char list -> char list) -> char list -> 'a -> char list)
         -> 'a
