@@ -17,7 +17,7 @@ the same thing with codepoints above the 17-plane Unicode limit.
 
 Copyright 2015-2018 Chris Cannam.
 
-Decoder inspired by Utf8.sml by Martin Elsman
+Decoder inspired by `Utf8.sml` by Martin Elsman
 (https://github.com/melsman/unicode).
 
 Encoder influenced by `utf8.sml` by John Reppy.
